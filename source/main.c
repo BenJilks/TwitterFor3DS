@@ -133,8 +133,7 @@ Result getRequest(const char *url, u8 **output, u32 *out_size)
     // Resize the buffer back down to our actual final size
 	last_buf = buf;
 	buf = (u8*)realloc(buf, size);
-
-    printf("downloaded size: %lu\n",size);
+    printf("downloaded size: %lu\n", size);
     
     httpcCloseContext(&context);
 	if (new_url != NULL) 
@@ -144,14 +143,6 @@ Result getRequest(const char *url, u8 **output, u32 *out_size)
     *out_size = size;
     return 0;
 }
-
-/*
-Result search_twitter()
-{
-    const char *url = "https://api.twitter.com/1.1/search/tweets.json";
-
-}
-*/
 
 void search_node(ezxml_t node)
 {
@@ -190,17 +181,27 @@ int main()
 
     u8 *src;
     u32 size;
-    if (getRequest("https://twitter.com/BenMcGen", &src, &size) == 0)
+    if (getRequest("http://google.com", &src, &size) == 0)
     {
         ezxml_t doc = ezxml_parse_str(src, size);
         search_node(doc);
         
+        ezxml_free(doc);
         free(src);
+        printf("Finished parsing twitter page\n");
     }
-
+    else
+    {
+        printf("Error loading twitter page :(\n");
+    }
+    
+    printf("\n\n              Press Start to exit.\n");
     while (aptMainLoop())
     {
         hidScanInput();
+        u32 k_down = hidKeysDown();
+        if (k_down & KEY_START)
+            break;
 
         gfxFlushBuffers();
         gfxSwapBuffers();
